@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Agent Support - 56LOTTERY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        :root {
+            --primary: #2C3E50;
+            --secondary: #E74C3C;
+            --accent: #3498DB;
+            --light: #ECF0F1;
+            --dark: #2C3E50;
+            --success: #27AE60;
+            --warning: #F39C12;
+            --danger: #E74C3C;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .back-arrow {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .header-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .support-panel {
+            flex: 1;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .agent-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .agent-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+        
+        .agent-name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .agent-status {
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #2ECC71;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        .message {
+            max-width: 80%;
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+        
+        .user-message {
+            margin-left: auto;
+            background-color: var(--accent);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            margin-right: auto;
+            background-color: white;
+            color: var(--dark);
+            border: 1px solid #ddd;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .system-message {
+            margin: 15px auto;
+            text-align: center;
+            background-color: var(--light);
+            color: var(--dark);
+            padding: 10px;
+            border-radius: 8px;
+            width: 90%;
+            font-size: 13px;
+        }
+        
+        .timestamp {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--dark);
+            border-radius: 50%;
+            margin: 0 2px;
+            opacity: 0.4;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation: typing 1s infinite;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation: typing 1s infinite 0.2s;
+        }
+        
+        .typing-dot:nth-child(3) {
+            animation: typing 1s infinite 0.4s;
+        }
+        
+        @keyframes typing {
+            0% { opacity: 0.4; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-5px); }
+            100% { opacity: 0.4; transform: translateY(0); }
+        }
+        
+        .input-area {
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-group {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        
+        #userInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+        
+        #userInput:focus {
+            border-color: var(--accent);
+        }
+        
+        #sendBtn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #sendBtn:hover {
+            background-color: #2980B9;
+        }
+        
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .quick-btn {
+            background-color: var(--light);
+            color: var(--dark);
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .quick-btn i {
+            margin-right: 5px;
+            font-size: 12px;
+        }
+        
+        .quick-btn:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .sidebar {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            padding: 20px;
+        }
+        
+        .info-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            font-size: 16px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .info-item {
+            margin-bottom: 15px;
+        }
+        
+        .info-item h4 {
+            font-size: 13px;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .info-item p {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .info-item a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .info-item a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+        
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+            margin-top: 10px;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        
+        .action-btn:hover {
+            background-color: #2980B9;
+        }
+        
+        .action-btn.secondary {
+            background-color: var(--light);
+            color: var(--dark);
+        }
+        
+        .action-btn.secondary:hover {
+            background-color: #ddd;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top:0px ;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            place-items: center;
+            justify-content: center;
+            justify-items: center;
+            align-items: center;
+            padding-top: 40px;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.3s;
+            position: relative;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            color: var(--primary);
+            font-size: 16px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 13px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .issue-list {
+            margin-top: 20px;
+        }
+        
+        .issue-item {
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .issue-title {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 14px;
+        }
+        
+        .issue-status {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background-color: #FFF3CD;
+            color: #856404;
+        }
+        
+        .status-resolved {
+            background-color: #D4EDDA;
+            color: #155724;
+        }
+        
+        .issue-details {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .issue-date {
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .no-issues {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .mobile-required {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .mobile-required i {
+            font-size: 40px;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+        
+        .mobile-required p {
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            font-size: 13px;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%);
+        }
+        
+        .toast i {
+            margin-right: 10px;
+        }
+        
+        .toast.success {
+            background-color: var(--success);
+        }
+        
+        .toast.error {
+            background-color: var(--danger);
+        }
+        
+        .toast.warning {
+            background-color: var(--warning);
+        }
+        
+        .chat-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+        
+        .chat-control-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .chat-control-btn i {
+            margin-right: 5px;
+        }
+        
+        .chat-control-btn:hover {
+            color: var(--accent);
+        }
+        
+        .voice-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .voice-btn {
+            background-color: var(--light);
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .voice-btn.active {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .header-title {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Push or replace the current state so back doesn`t re-trigger form submission
+        if (window.history.replaceState) {
+            window.history.replaceState(null, "", window.location.href);
+        }
+    </script>
+    <header>
+        <div class="back-arrow" onclick="window.history.back()">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+        <div class="container">
+            <div class="header-title">Live Agent Support</div>
+            <div class="header-subtitle">56LOTTERY - Premium Customer Assistance</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="main-content">
+            <div class="support-panel">
+                <div class="panel-header">
+                    <div class="agent-info">
+                        <img src="https://thispersondoesnotexist.com/" alt="Agent" class="agent-avatar" id="agentAvatar">
+                        <div>
+                            <div class="agent-name" id="agentName">Loading agent...</div>
+                            <div class="agent-status">
+                                <span class="status-dot"></span>
+                                <span>Online</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-container" id="chatbox">
+                    <div class="system-message">
+                        Welcome to 56LOTTERY Live Support. Please verify your mobile number to access support services.
+                    </div>
+                    <div class="mobile-required" id="mobileRequired">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h4>Mobile Verification Required</h4>
+                        <p>To protect your account security and provide personalized support, please enter your registered mobile number.</p>
+                        <input type="text" id="mobileInput" class="form-control" placeholder="Enter 10-digit mobile number" maxlength="10" style="width: 200px; text-align: center;">
+                        <button class="action-btn" id="verifyMobileBtn" style="margin-top: 15px;">Verify Mobile</button>
+                    </div>
+                </div>
+                
+                <div class="input-area">
+                    <div class="voice-controls" id="voiceControls" style="display: none;">
+                        <button class="voice-btn" id="voiceBtnEnglish">
+                            <i class="fas fa-microphone"></i> English Voice
+                        </button>
+                        <button style="display: none" class="voice-btn" id="voiceBtnHindi">
+                            <i class="fas fa-microphone"></i> Hindi Voice
+                        </button>
+                    </div>
+                    <div class="chat-controls">
+                        <button class="chat-control-btn" id="clearChatBtn">
+                            <i class="fas fa-trash-alt"></i> Clear Chat
+                        </button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="userInput" placeholder="Type your message here..." disabled>
+                        <button id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="sendQuickMessage('Withdrawal issue')">
+                            <i class="fas fa-money-bill-wave"></i> Withdrawal
+                        </button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Deposit problem')">
+                            <i class="fas fa-wallet"></i> Deposit
+                        </button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Game not working')">
+                            <i class="fas fa-gamepad"></i> Game Issue
+                        </button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Password reset')">
+                            <i class="fas fa-key"></i> Password
+                        </button>
+                        <button class="quick-btn" onclick="sendQuickMessage('Account verification')">
+                            <i class="fas fa-user-check"></i> Account
+                        </button>
+                        <button class="quick-btn" onclick="openReportModal()">
+                            <i class="fas fa-file-alt"></i> Check Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="info-card">
+                    <h3>Support Information</h3>
+                    <div class="info-item">
+                        <h4>Telegram Support</h4>
+                        <p>For immediate assistance, contact our Telegram support team:</p>
+                        <a href="https://telegram.dog/official56lottery" target="_blank">@56LOTTERYofficial</a>
+                    </div>
+                    <div class="info-item">
+                        <h4>Working Hours</h4>
+                        <p>24/7 Support Available</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Average Response Time</h4>
+                        <p>Within 15 minutes for premium users</p>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Quick Links</h3>
+                    <a href="https://56lottery.site" class="action-btn" target="_blank">
+                        <i class="fas fa-globe"></i> Visit 56lottery.site
+                    </a>
+                    <button class="action-btn secondary" onclick="openReportModal()">
+                        <i class="fas fa-search"></i> Check Issue Status
+                    </button>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Common Solutions</h3>
+                    <div class="info-item">
+                        <h4>Withdrawal Delay?</h4>
+                        <p>Ensure your account is verified and provide transaction details</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Deposit Not Showing?</h4>
+                        <p>Check your transaction status and provide UTR number</p>
+                    </div>
+                    <div class="info-item">
+                        <h4>Game Issues?</h4>
+                        <p>Clear cache or try different browser/device</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Report Status Modal -->
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Check Issue Status</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="reportMobile">Enter Your Mobile Number</label>
+                    <input type="text" id="reportMobile" class="form-control" placeholder="9876543210" maxlength="10">
+                </div>
+                <button class="action-btn" onclick="checkReports()">Check Status</button>
+                
+                <div class="issue-list" id="issueList">
+                    <!-- Issues will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">This is a toast message</span>
+    </div>
+    
+    <script>
+        // Indian names for random agent assignment
+        const indianNames = [
+            "Aarav Sharma", "Vihaan Patel", "Aditya Singh", "Ananya Gupta", 
+            "Diya Kumar", "Ishaan Verma", "Riya Choudhury", "Arjun Malhotra",
+            "Saanvi Reddy", "Vivaan Joshi", "Kiara Iyer", "Shaurya Nair",
+            "Anika Trivedi", "Reyansh Mehra", "Myra Saxena", "Ayaan Khanna"
+        ];
+        
+        // Greetings and common phrases
+        const greetings = [
+            "hi", "hello", "hey", "hy", "hii", "helloo", "hey there", 
+            "namaste", "namaskar", "good morning", "good afternoon", "good evening",
+            "hi there", "hello there", "hey buddy", "greetings", "sup", "yo"
+        ];
+        
+        // Mode setting (change to 'live' for production)
+        const mode = 'live'; // 'demo' or 'live'
+        
+        // Current user data
+        let currentUser = {
+            mobile: null,
+            name: null,
+            verified: false,
+            issues: [],
+            chatHistory: []
+        };
+        
+        // Voice settings
+        let voiceSettings = {
+            active: false,
+            language: 'en', // 'en' or 'hi'
+            recognition: null
+        };
+        
+        // Initialize the page
+        $(document).ready(function() { 
+            $("#reportModal").hide();
+            
+            // Set random agent
+            setRandomAgent();
+            
+            // Load chat history from session storage
+            loadChatHistory();
+            
+            // Mobile verification button
+            $("#verifyMobileBtn").click(verifyMobile);
+            
+            // Send button and input field
+            $("#sendBtn").click(sendMessage);
+            $("#userInput").keypress(function(e) {
+                if (e.which == 13) {
+                    sendMessage();
+                }
+            });
+            
+            // Clear chat button
+            $("#clearChatBtn").click(clearChat);
+            
+            // Voice control buttons
+            $("#voiceBtnEnglish").click(function() {
+                toggleVoiceRecognition('en');
+            });
+            
+            $("#voiceBtnHindi").click(function() {
+                toggleVoiceRecognition('hi');
+            });
+        });
+        
+        function setRandomAgent() {
+            const randomName = indianNames[Math.floor(Math.random() * indianNames.length)];
+            $("#agentName").text(randomName);
+            
+            // Refresh agent image (thispersondoesnotexist generates new images on each load)
+            $("#agentAvatar").attr("src", "https://thispersondoesnotexist.com/?t=" + new Date().getTime());
+        }
+        
+        function verifyMobile() {
+            const mobile = $("#mobileInput").val().trim();
+            
+            if (!/^\d{10}$/.test(mobile)) {
+                showToast("Enter 10-digit mobile number", "error");
+                return;
+            }
+            
+            if (mode === 'live') {
+                // Live database verification
+                $.ajax({
+                    url: 'verify_mobile.php',
+                    type: 'POST',
+                    data: { mobile: mobile },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            currentUser.mobile = mobile;
+                            currentUser.name = response.name;
+                            currentUser.verified = true;
+                            
+                            $("#mobileRequired").addClass("hidden");
+                            $("#userInput").prop("disabled", false);
+                            $("#sendBtn").prop("disabled", false);
+                            $("#voiceControls").show();
+                            
+                            addSystemMessage(`Welcome back, ${response.name}! How can we assist you today?`);
+                            showToast("Mobile verification successful", "success");
+                            
+                            // Add quick help message
+                            setTimeout(function() {
+                                addBotMessage("You can quickly ask about:\n• Withdrawal status\n• Deposit issues\n• Game problems\n• Account verification\n• Password reset");
+                            }, 1500);
+                        } else {
+                            showToast("Number is not registered in our system", "error");
+                        }
+                    },
+                    error: function() {
+                        showToast("Error connecting to verification service", "error");
+                    }
+                });
+            } else {
+                // Demo mode - skip actual verification
+                currentUser.mobile = mobile;
+                currentUser.name = "Demo User";
+                currentUser.verified = true;
+                
+                $("#mobileRequired").addClass("hidden");
+                $("#userInput").prop("disabled", false);
+                $("#sendBtn").prop("disabled", false);
+                $("#voiceControls").show();
+                
+                addSystemMessage("Welcome to 56LOTTERY Support. How can we assist you today?");
+                showToast("Mobile verification successful (demo mode)", "success");
+                
+                // Add quick help message
+                setTimeout(function() {
+                    addBotMessage("You can quickly ask about:\n• Withdrawal status\n• Deposit issues\n• Game problems\n• Account verification\n• Password reset");
+                }, 1500);
+            }
+        }
+        
+        function sendMessage() {
+            const message = $("#userInput").val().trim();
+            if (!message || !currentUser.verified) return;
+            
+            // Check if it's just a greeting
+            const isGreeting = greetings.some(greet => 
+                message.toLowerCase().replace(/[^a-z]/g, '') === greet.toLowerCase().replace(/[^a-z]/g, '')
+            );
+            
+            if (isGreeting) {
+                const responses = [
+                    "Hello! How can I assist you today?",
+                    "Hi there! What can I help you with?",
+                    "Greetings! Please let me know how I can help.",
+                    "Namaste! How may I assist you today?",
+                    "Hello! Do you have any questions or issues I can help with?"
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                addUserMessage(message);
+                $("#userInput").val("");
+                
+                // Save to chat history
+                saveChatToHistory({
+                    type: 'user',
+                    message: message,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Show typing indicator
+                const typingIndicator = $(`
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                `);
+                $("#chatbox").append(typingIndicator);
+                $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+                
+                // Process after a short delay to simulate typing
+                setTimeout(function() {
+                    typingIndicator.remove();
+                    addBotMessage(randomResponse);
+                    
+                    // Save bot response to chat history
+                    saveChatToHistory({
+                        type: 'bot',
+                        message: randomResponse,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    // Speak the response
+                    speakResponse(randomResponse);
+                }, 1500);
+                
+                return;
+            }
+            
+            addUserMessage(message);
+            $("#userInput").val("");
+            
+            // Save to chat history
+            saveChatToHistory({
+                type: 'user',
+                message: message,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Show typing indicator
+            const typingIndicator = $(`
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            `);
+            $("#chatbox").append(typingIndicator);
+            $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+            
+            // Process after a short delay to simulate typing
+            setTimeout(function() {
+                typingIndicator.remove();
+                processUserMessage(message);
+            }, 1500);
+        }
+        
+        function sendQuickMessage(message) {
+            if (!currentUser.verified) {
+                showToast("Please verify your mobile first to send messages", "warning");
+                return;
+            }
+            
+            $("#userInput").val(message);
+            sendMessage();
+        }
+        
+        function processUserMessage(message) {
+            // Check if this is a genuine problem or just a greeting/small talk
+            const isGenuineIssue = !isSmallTalk(message);
+            
+            if (isGenuineIssue) {
+                // Save issue to database (in a real system, this would go to backend)
+                const issueType = detectIssueType(message);
+                const newIssue = {
+                    id: "ISSUE-" + new Date().getTime(),
+                    title: getIssueTitle(issueType),
+                    type: issueType,
+                    date: new Date().toISOString().split('T')[0],
+                    status: "pending",
+                    details: message,
+                    response: ""
+                };
+                
+                // Add to current user's issues
+                currentUser.issues.push(newIssue);
+                
+                // Save to database in live mode
+                if (mode === 'live') {
+                    saveIssueToDatabase(newIssue);
+                }
+                
+                // Save to session storage
+                saveUserData();
+            }
+            
+            // Generate response
+            const response = generateResponse(message, isGenuineIssue ? detectIssueType(message) : 'general');
+            addBotMessage(response);
+            
+            // Save bot response to chat history
+            saveChatToHistory({
+                type: 'bot',
+                message: response,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Speak the response
+            speakResponse(response);
+        }
+        
+        function isSmallTalk(message) {
+            const lowerMsg = message.toLowerCase();
+            
+            // Check for greetings
+            if (greetings.some(greet => lowerMsg.includes(greet.toLowerCase()))) {
+                return true;
+            }
+            
+            // Check for other small talk phrases
+            const smallTalkPhrases = [
+                "how are you", "what's up", "how's it going", "good to see you",
+                "nice to meet you", "thank you", "thanks", "appreciate it",
+                "have a nice day", "good night", "goodbye", "bye", "see you",
+                "you're welcome", "no problem", "that's great", "awesome", "cool"
+            ];
+            
+            return smallTalkPhrases.some(phrase => lowerMsg.includes(phrase));
+        }
+        
+        function detectIssueType(message) {
+            const lowerMsg = message.toLowerCase();
+            
+            if (lowerMsg.includes("withdraw") || lowerMsg.includes("payout") || lowerMsg.includes("withdrawal")) {
+                return "withdrawal";
+            } else if (lowerMsg.includes("deposit") || lowerMsg.includes("add fund") || lowerMsg.includes("add money")) {
+                return "deposit";
+            } else if (lowerMsg.includes("game") || lowerMsg.includes("play") || lowerMsg.includes("ludo") || lowerMsg.includes("rummy")) {
+                return "game";
+            } else if (lowerMsg.includes("password") || lowerMsg.includes("login") || lowerMsg.includes("sign in")) {
+                return "account";
+            } else if (lowerMsg.includes("verify") || lowerMsg.includes("kyc") || lowerMsg.includes("verification")) {
+                return "verification";
+            } else if (lowerMsg.includes("bug") || lowerMsg.includes("error") || lowerMsg.includes("technical")) {
+                return "technical";
+            } else if (lowerMsg.includes("balance") || lowerMsg.includes("money") || lowerMsg.includes("fund")) {
+                return "balance";
+            } else if (lowerMsg.includes("bonus") || lowerMsg.includes("offer") || lowerMsg.includes("promo")) {
+                return "bonus";
+            } else if (lowerMsg.includes("refer") || lowerMsg.includes("friend") || lowerMsg.includes("invite")) {
+                return "referral";
+            } else if (lowerMsg.includes("bank") || lowerMsg.includes("account") || lowerMsg.includes("upi")) {
+                return "bank";
+            } else if (lowerMsg.includes("customer") || lowerMsg.includes("support") || lowerMsg.includes("help")) {
+                return "support";
+            } else if (lowerMsg.includes("utr") || lowerMsg.includes("transaction") || lowerMsg.includes("reference")) {
+                return "transaction";
+            } else {
+                return "general";
+            }
+        }
+        
+        function getIssueTitle(type) {
+            const titles = {
+                "withdrawal": "Withdrawal Issue",
+                "deposit": "Deposit Problem",
+                "game": "Game Not Working",
+                "account": "Account Access",
+                "verification": "Verification Request",
+                "technical": "Technical Problem",
+                "general": "General Inquiry",
+                "balance": "Balance Inquiry",
+                "bonus": "Bonus Issue",
+                "referral": "Referral Problem",
+                "bank": "Bank Account Issue",
+                "support": "Support Request",
+                "transaction": "Transaction Query"
+            };
+            return titles[type] || "Support Request";
+        }
+        
+        function generateResponse(message, issueType) {
+            // Check for UTR number validation
+            if (message.toLowerCase().includes("utr") || message.toLowerCase().includes("transaction")) {
+                const utrMatch = message.match(/\b\d{12}\b/);
+                if (utrMatch) {
+                    const utr = utrMatch[0];
+                    if (validateUTR(utr)) {
+                        return `<strong>✅ UTR Verified</strong><br>We've successfully verified your UTR number ${utr}. Your transaction is being processed and should reflect within 2-4 hours. For further assistance, contact @56LOTTERYofficial on Telegram.`;
+                    } else {
+                        return `<strong>❌ Invalid UTR</strong><br>The UTR number ${utr} appears to be invalid. Please check and provide the correct 12-digit UTR number. UTR numbers are typically numeric and exactly 12 digits long.`;
+                    }
+                }
+            }
+            
+            const prefix = {
+                "withdrawal": "💳 Withdrawal Assistance",
+                "deposit": "💰 Deposit Support",
+                "game": "🎮 Game Support",
+                "account": "🔑 Account Help",
+                "verification": "🆔 Verification Help",
+                "technical": "🛠 Technical Support",
+                "general": "ℹ️ General Support",
+                "balance": "💲 Balance Inquiry",
+                "bonus": "🎁 Bonus Support",
+                "referral": "👥 Referral Help",
+                "bank": "🏦 Bank Account Support",
+                "support": "🆘 Customer Support",
+                "transaction": "🔍 Transaction Help"
+            }[issueType] || "ℹ️ Support";
+            
+            const responses = {
+                "withdrawal": `Thank you for reporting your withdrawal issue. Our team will process your request within 24 hours. For faster resolution, please contact @56LOTTERYofficial on Telegram with:<br>1. Your registered mobile number<br>2. Withdrawal amount<br>3. Transaction date/time<br>4. Screenshot if available`,
+                "deposit": `We've received your deposit query. Please provide your UTR number for us to investigate. Deposits typically reflect within 2 hours. If not, please share:<br>1. Amount deposited<br>2. Transaction ID/UTR<br>3. Screenshot of payment confirmation<br>4. Bank account details used`,
+                "game": `We're sorry you're experiencing game issues. Please try:<br>1. Clearing cache and cookies<br>2. Using different browser (Chrome recommended)<br>3. Checking internet connection<br>4. Restarting your device<br>If problem persists, share:<br>1. Game name<br>2. Device details (make/model)<br>3. Exact error message/screenshot`,
+                "account": `For account/password issues, please contact @56LOTTERYofficial on Telegram with:<br>1. Your registered mobile number<br>2. Account creation date (if known)<br>3. Last successful login date<br>We'll help you regain access securely.`,
+                "verification": `Account verification ensures security. Please share your details via Telegram @56LOTTERYofficial with:<br>1. Mobile number<br>2. Any verification documents you have<br>3. Screenshot of any error message<br>Our team will verify within 24 hours.`,
+                "technical": `Our technical team has been notified. Please share:<br>1. Detailed issue description<br>2. Screenshots/video<br>3. Device/browser details<br>4. Steps to reproduce the issue<br>For immediate help, contact @56LOTTERYofficial on Telegram.`,
+                "general": `Thank you for contacting 56LOTTERY Support. Our team will respond shortly. For faster response, please contact @56LOTTERYofficial on Telegram with:<br>1. Your query details<br>2. Registered mobile number<br>3. Relevant screenshots`,
+                "balance": `For balance inquiries, please check your transaction history first. If there's still an issue, contact @56LOTTERYofficial on Telegram with:<br>1. Registered mobile number<br>2. Last known correct balance<br>3. Date/time you noticed discrepancy<br>4. Screenshots if available`,
+                "bonus": `For bonus-related queries, please share:<br>1. Bonus code used (if any)<br>2. Date/time of claiming bonus<br>3. Screenshot of offer/bonus terms<br>4. Error message received<br>Our team will investigate and respond within 24 hours.`,
+                "referral": `For referral program issues, please provide:<br>1. Your referral code<br>2. Friend's registered number<br>3. Date of signup<br>4. Screenshot of referral page<br>Contact @56LOTTERYofficial on Telegram for faster resolution.`,
+                "bank": `For bank account issues, please share:<br>1. Bank name<br>2. Account holder name<br>3. Last 4 digits of account<br>4. Screenshot of issue<br>For security, never share full account details in chat. Contact @56LOTTERYofficial on Telegram.`,
+                "support": `For direct support, please contact our Telegram team @56LOTTERYofficial with:<br>1. Registered mobile number<br>2. Detailed issue description<br>3. Relevant screenshots<br>4. Previous ticket ID (if any)<br>Response time is typically under 15 minutes.`,
+                "transaction": `For transaction queries, please provide:<br>1. 12-digit UTR number<br>2. Exact amount<br>3. Date/time of transaction<br>4. Screenshot of confirmation<br>Without UTR, we cannot trace transactions. Contact @56LOTTERYofficial on Telegram.`
+            };
+            
+            return `<strong>${prefix}</strong><br>${responses[issueType] || responses['general']}`;
+        }
+        
+        function validateUTR(utr) {
+            // Basic UTR validation - 12 digits
+            return /^\d{12}$/.test(utr);
+        }
+        
+        function addUserMessage(message) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const messageElement = $(`
+                <div class="message user-message">
+                    ${message}
+                    <div class="timestamp">${timeString}</div>
+                </div>
+            `);
+            
+            $("#chatbox").append(messageElement);
+            $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+        }
+        
+        function addBotMessage(message) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const messageElement = $(`
+                <div class="message bot-message">
+                    ${message}
+                    <div class="timestamp">${timeString}</div>
+                </div>
+            `);
+            
+            $("#chatbox").append(messageElement);
+            $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+        }
+        
+        function addSystemMessage(message) {
+            const messageElement = $(`
+                <div class="system-message">
+                    ${message}
+                </div>
+            `);
+            
+            $("#chatbox").append(messageElement);
+            $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+            
+            // Save to chat history
+            saveChatToHistory({
+                type: 'system',
+                message: message,
+                timestamp: new Date().toISOString()
+            });
+        }
+        
+        function speakResponse(text) {
+            if ('speechSynthesis' in window) {
+                // Remove HTML tags from text
+                const cleanText = text.replace(/<[^>]*>/g, '');
+                
+                const speech = new SpeechSynthesisUtterance();
+                speech.text = cleanText;
+                speech.volume = 1;
+                speech.rate = 0.9;
+                speech.pitch = 1;
+                
+                // Set language based on voice settings
+                speech.lang = voiceSettings.language === 'hi' ? 'hi-IN' : 'en-US';
+                
+                // Use a different voice if available
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    // Try to find a voice matching the selected language
+                    const languageVoice = voices.find(v => 
+                        voiceSettings.language === 'hi' ? 
+                        v.lang === 'hi-IN' || v.name.includes('Hindi') : 
+                        v.lang === 'en-US' || v.name.includes('English')
+                    );
+                    
+                    if (languageVoice) {
+                        speech.voice = languageVoice;
+                    } else {
+                        speech.voice = voices[0];
+                    }
+                }
+                
+                window.speechSynthesis.speak(speech);
+            }
+        }
+        
+        function toggleVoiceRecognition(language) {
+            if (voiceSettings.active && voiceSettings.language === language) {
+                // Stop recognition if already active for this language
+                if (voiceSettings.recognition) {
+                    voiceSettings.recognition.stop();
+                }
+                voiceSettings.active = false;
+                $("#voiceBtnEnglish, #voiceBtnHindi").removeClass("active");
+                showToast("Voice recognition stopped", "info");
+                return;
+            }
+            
+            // Initialize recognition if not already done
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                showToast("Voice recognition not supported in your browser", "error");
+                return;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            voiceSettings.recognition = new SpeechRecognition();
+            voiceSettings.recognition.continuous = false;
+            voiceSettings.recognition.interimResults = false;
+            voiceSettings.recognition.lang = language === 'hi' ? 'hi-IN' : 'en-US';
+            
+            voiceSettings.recognition.onstart = function() {
+                voiceSettings.active = true;
+                voiceSettings.language = language;
+                $("#voiceBtnEnglish, #voiceBtnHindi").removeClass("active");
+                $(`#voiceBtn${language === 'hi' ? 'Hindi' : 'English'}`).addClass("active");
+                showToast(`Listening for ${language === 'hi' ? 'Hindi' : 'English'}...`, "info");
+            };
+            
+            voiceSettings.recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                $("#userInput").val(transcript);
+                sendMessage();
+            };
+            
+            voiceSettings.recognition.onerror = function(event) {
+                console.error("Voice recognition error", event.error);
+                showToast("Voice recognition error: " + event.error, "error");
+                voiceSettings.active = false;
+                $("#voiceBtnEnglish, #voiceBtnHindi").removeClass("active");
+            };
+            
+            voiceSettings.recognition.onend = function() {
+                if (voiceSettings.active) {
+                    // Restart recognition if still active
+                    voiceSettings.recognition.start();
+                } else {
+                    $("#voiceBtnEnglish, #voiceBtnHindi").removeClass("active");
+                }
+            };
+            
+            // Stop any existing recognition
+            if (voiceSettings.recognition) {
+                voiceSettings.recognition.stop();
+            }
+            
+            // Start new recognition
+            voiceSettings.recognition.start();
+        }
+        
+        function openReportModal() {
+            $("#reportModal").show();
+        }
+        
+        function closeModal() {
+            $("#reportModal").hide();
+            $("#issueList").empty();
+            $("#reportMobile").val("");
+        }
+        
+        function checkReports() {
+            const mobile = $("#reportMobile").val().trim();
+            
+            if (!/^\d{10}$/.test(mobile)) {
+                showToast("Enter a valid 10-digit mobile number", "error");
+                return;
+            }
+            
+            if (mode === 'live') {
+                // Live database check
+                $.ajax({
+                    url: 'check_reports.php',
+                    type: 'POST',
+                    data: { mobile: mobile },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            displayIssues(response.issues);
+                        } else {
+                            $("#issueList").html(`
+                                <div class="no-issues">
+                                    <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                    <p>No issues found for this mobile number. Please verify the number or contact support.</p>
+                                </div>
+                            `);
+                        }
+                    },
+                    error: function() {
+                        showToast("Error connecting to report service", "error");
+                    }
+                });
+            } else {
+                // Demo mode - use local issues
+                if (mobile === currentUser.mobile && currentUser.issues.length > 0) {
+                    displayIssues(currentUser.issues);
+                } else {
+                    $("#issueList").html(`
+                        <div class="no-issues">
+                            <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                            <p>No issues found for this mobile number in demo mode.</p>
+                        </div>
+                    `);
+                }
+            }
+        }
+        
+        function displayIssues(issues) {
+            if (!issues || issues.length === 0) {
+                $("#issueList").html(`
+                    <div class="no-issues">
+                        <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>No issues found for this account.</p>
+                    </div>
+                `);
+                return;
+            }
+            
+            let issuesHtml = '';
+            
+            // Filter only genuine issues (not greetings/small talk)
+            const genuineIssues = issues.filter(issue => !isSmallTalk(issue.details));
+            
+            if (genuineIssues.length === 0) {
+                $("#issueList").html(`
+                    <div class="no-issues">
+                        <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>No genuine issues found for this account.</p>
+                    </div>
+                `);
+                return;
+            }
+            
+            genuineIssues.forEach(issue => {
+                issuesHtml += `
+                    <div class="issue-item">
+                        <div class="issue-header">
+                            <div class="issue-title">${issue.title}</div>
+                            <div class="issue-status ${'status-' + issue.status}">
+                                ${issue.status.charAt(0).toUpperCase() + issue.status.slice(1)}
+                            </div>
+                        </div>
+                        <div class="issue-details">${issue.details}</div>
+                        ${issue.response ? `<div class="issue-details"><strong>Response:</strong> ${issue.response}</div>` : ''}
+                        <div class="issue-date">Reported on ${issue.created_at}</div>
+                    </div>
+                `;
+            });
+            
+            $("#issueList").html(issuesHtml);
+        }
+        
+        function showToast(message, type) {
+            const toast = $("#toast");
+            const toastMessage = $("#toastMessage");
+            
+            toast.removeClass("success error warning show");
+            
+            toastMessage.text(message);
+            toast.addClass(type);
+            
+            setTimeout(function() {
+                toast.addClass("show");
+            }, 100);
+            
+            setTimeout(function() {
+                toast.removeClass("show");
+            }, 3000);
+        }
+        
+        function saveChatToHistory(message) {
+            // Don't save greetings/small talk to history
+            if (message.type === 'user' && isSmallTalk(message.message)) {
+                return;
+            }
+            
+            currentUser.chatHistory.push(message);
+            saveUserData();
+        }
+        
+        function loadChatHistory() {
+            const savedData = sessionStorage.getItem('56LOTTERYSupportData');
+            if (savedData) {
+                currentUser = JSON.parse(savedData);
+                
+                if (currentUser.verified) {
+                    $("#mobileRequired").addClass("hidden");
+                    $("#userInput").prop("disabled", false);
+                    $("#sendBtn").prop("disabled", false);
+                    $("#voiceControls").show();
+                    
+                    // Rebuild chat history
+                    $("#chatbox").empty();
+                    currentUser.chatHistory.forEach(msg => {
+                        if (msg.type === 'user') {
+                            addUserMessage(msg.message);
+                        } else if (msg.type === 'bot') {
+                            addBotMessage(msg.message);
+                        } else if (msg.type === 'system') {
+                            addSystemMessage(msg.message);
+                        }
+                    });
+                }
+            }
+        }
+        
+        function saveUserData() {
+            sessionStorage.setItem('56LOTTERYSupportData', JSON.stringify(currentUser));
+        }
+        
+        function clearChat() {
+            if (!confirm("Are you sure you want to clear the chat history?")) return;
+            
+            $("#chatbox").empty();
+            currentUser.chatHistory = [];
+            saveUserData();
+            
+            addSystemMessage("Chat history has been cleared. How can we assist you today?");
+            showToast("Chat history cleared", "success");
+        }
+        
+        function saveIssueToDatabase(issueData) {
+            if (mode !== 'live') return;
+            
+            // Don't save greetings/small talk to database
+            if (isSmallTalk(issueData.details)) {
+                return;
+            }
+            
+            $.ajax({
+                url: 'save_issue.php',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    mobile: currentUser.mobile,
+                    type: issueData.type,
+                    title: issueData.title,
+                    details: issueData.details
+                }),
+                success: function(response) {
+                    if (!response.success) {
+                        console.error('Failed to save issue to database');
+                    }
+                },
+                error: function() {
+                    console.error('Error saving issue to database');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
